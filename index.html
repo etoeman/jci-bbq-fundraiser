@@ -811,8 +811,8 @@
     <div class="row"><span>Subtotal</span><span id="subtotal" class="mono">$0.00</span></div>
     <div class="row"><span>Delivery fee</span><span id="deliveryFee" class="mono">$5.00</span></div>
     <div class="row total"><span>Total</span><span id="total" class="mono">$0.00</span></div>
-    <button class="checkout-btn" id="checkoutBtn">Continue to checkout</button>
-    <p class="checkout-note">Checkout opens an order form. Customers can pay by MoBanking/bank transfer, cash on delivery, or PayPal.</p>
+    <button class="checkout-btn" id="checkoutBtn">Continue to order form</button>
+    <p class="checkout-note">Checkout opens the Jotform order form with your cart details already filled in.</p>
   </div>
 </aside>
 
@@ -879,7 +879,7 @@
       </div>
 
       <div class="checkout-actions">
-        <button type="submit" class="checkout-btn">Send order by WhatsApp</button>
+        <button type="submit" class="checkout-btn">Open Jotform order form</button>
         <button type="button" class="secondary-btn" id="copyOrderBtn">Copy order text</button>
       </div>
       <p class="small-note">This does not process card payments on the website. It prepares the order for WhatsApp/manual confirmation by the fundraiser team.</p>
@@ -1065,96 +1065,66 @@
   document.getElementById('cartCloseBtn').addEventListener('click', closeDrawer);
   overlay.addEventListener('click', closeDrawer);
 
-  // ---- Checkout: keeps the cart, then sends/copies order for WhatsApp/manual payment ----
-  const ORDER_WHATSAPP_NUMBER = '17672751234'; // CHANGE THIS to the volunteer/order WhatsApp number, digits only, country code first.
+  // ---- Checkout: keeps the cart, then sends order details to Jotform ----
+  const JOTFORM_URL = 'https://form.jotform.com/261714879759073';
 
-  const checkoutOverlay = document.getElementById('checkoutOverlay');
-  const checkoutModal = document.getElementById('checkoutModal');
-  const paymentMethod = document.getElementById('paymentMethod');
-
-  function getOrderSummary(){
+  function getOrderParts(){
     const items = Object.values(cart);
     const zoneSelect = document.getElementById('zoneSelect');
     const deliveryText = zoneSelect.options[zoneSelect.selectedIndex].text;
     const subtotal = items.reduce((s,it)=> s + it.qty*it.price, 0);
     const deliveryFee = items.length ? parseFloat(zoneSelect.value) : 0;
     const total = subtotal + deliveryFee;
+    const summaryLines = [];
 
-    if(items.length === 0) return 'Your cart is empty.';
+    summaryLines.push('BBQ RUSH ORDER');
+    summaryLines.push('----------------');
+    items.forEach(it => summaryLines.push(`${it.qty} x ${it.name} — ${fmt(it.qty * it.price)}`));
+    summaryLines.push('');
+    summaryLines.push(`Subtotal: ${fmt(subtotal)}`);
+    summaryLines.push(`Delivery: ${fmt(deliveryFee)} (${deliveryText})`);
+    summaryLines.push(`TOTAL: ${fmt(total)}`);
 
-    const lines = [];
-    lines.push('BBQ RUSH ORDER');
-    lines.push('----------------');
-    items.forEach(it => lines.push(`${it.qty} x ${it.name} — ${fmt(it.qty * it.price)}`));
-    lines.push('');
-    lines.push(`Subtotal: ${fmt(subtotal)}`);
-    lines.push(`Delivery: ${fmt(deliveryFee)} (${deliveryText})`);
-    lines.push(`TOTAL: ${fmt(total)}`);
-    return lines.join('\n');
+    return {
+      items,
+      summary: items.length ? summaryLines.join('\n') : 'Your cart is empty.',
+      subtotal,
+      deliveryFee,
+      total,
+      deliveryText
+    };
   }
 
-  function getFullOrderMessage(){
-    const name = document.getElementById('customerName').value.trim();
-    const phone = document.getElementById('customerPhone').value.trim();
-    const address = document.getElementById('deliveryAddress').value.trim();
-    const method = paymentMethod.value;
-    const notes = document.getElementById('customerNotes').value.trim();
-
-    return [
-      getOrderSummary(),
-      '',
-      'CUSTOMER DETAILS',
-      '----------------',
-      `Name: ${name}`,
-      `Phone/WhatsApp: ${phone}`,
-      `Delivery Address: ${address}`,
-      `Payment Method: ${method}`,
-      notes ? `Notes: ${notes}` : ''
-    ].filter(Boolean).join('\n');
-  }
-
-  function openCheckout(){
-    if(Object.values(cart).length === 0){
+  function openJotformCheckout(){
+    const order = getOrderParts();
+    if(order.items.length === 0){
       alert('Your cart is empty. Please add at least one item before checkout.');
       return;
     }
-    document.getElementById('checkoutSummary').textContent = getOrderSummary();
+
+    const params = new URLSearchParams();
+
+    // These names should match the Jotform field "Unique Name" values.
+    // Extra duplicates are harmless and make prefill more likely if field names differ slightly.
+    params.set('orderSummary', order.summary);
+    params.set('orderTotal', order.total.toFixed(2));
+    params.set('deliveryZone', order.deliveryText);
+    params.set('deliveryFee', order.deliveryFee.toFixed(2));
+    params.set('subtotal', order.subtotal.toFixed(2));
+    params.set('paymentMethod', 'MoBanking / Bank Transfer');
+
+    params.set('Order Summary', order.summary);
+    params.set('Order Total', order.total.toFixed(2));
+    params.set('Delivery Zone', order.deliveryText);
+    params.set('Delivery Fee', order.deliveryFee.toFixed(2));
+    params.set('Subtotal', order.subtotal.toFixed(2));
+    params.set('Payment Method', 'MoBanking / Bank Transfer');
+
     closeDrawer();
-    checkoutOverlay.classList.add('open');
-    checkoutModal.classList.add('open');
-  }
-  function closeCheckout(){
-    checkoutOverlay.classList.remove('open');
-    checkoutModal.classList.remove('open');
+    window.open(`${JOTFORM_URL}?${params.toString()}`, '_blank');
   }
 
-  function updatePaymentInstructions(){
-    document.getElementById('bankInstructions').classList.toggle('open', paymentMethod.value === 'MoBanking / Bank Transfer');
-    document.getElementById('cashInstructions').classList.toggle('open', paymentMethod.value === 'Cash on Delivery');
-    document.getElementById('paypalInstructions').classList.toggle('open', paymentMethod.value === 'PayPal');
-  }
-
-  document.getElementById('checkoutBtn').addEventListener('click', openCheckout);
-  document.getElementById('checkoutCloseBtn').addEventListener('click', closeCheckout);
-  checkoutOverlay.addEventListener('click', closeCheckout);
-  paymentMethod.addEventListener('change', updatePaymentInstructions);
-
-  document.getElementById('copyOrderBtn').addEventListener('click', async () => {
-    const message = getFullOrderMessage();
-    try{
-      await navigator.clipboard.writeText(message);
-      alert('Order text copied. You can paste it into WhatsApp, SMS, or email.');
-    } catch(err){
-      alert(message);
-    }
-  });
-
-  document.getElementById('checkoutForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const message = getFullOrderMessage();
-    const whatsappUrl = `https://wa.me/${ORDER_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  });
+  document.getElementById('checkoutBtn').addEventListener('click', openJotformCheckout);
 
   // chip active state on scroll
   const sections = ['mains','sides','drinks'].map(id => document.getElementById(id));
