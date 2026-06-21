@@ -304,6 +304,55 @@
   .checkout-btn:hover{background:var(--ember-dark);}
   .checkout-note{font-size:11.5px;color:var(--smoke);text-align:center;margin-top:10px;line-height:1.5;}
 
+
+  /* ---------- CHECKOUT MODAL ---------- */
+  .checkout-modal{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.96);
+    width:560px;max-width:92vw;max-height:88vh;overflow-y:auto;
+    background:var(--cream);border-radius:18px;box-shadow:var(--shadow-pop);
+    z-index:65;opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;
+  }
+  .checkout-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
+  .checkout-head{
+    background:var(--charcoal);color:var(--cream);padding:20px 22px;border-radius:18px 18px 0 0;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+  }
+  .checkout-head h3{font-size:21px;color:var(--cream);}
+  .checkout-head button{color:var(--cream);font-size:20px;line-height:1;}
+  .checkout-body{padding:20px 22px 22px;}
+  .checkout-summary{
+    background:#fff;border:1px solid var(--paper-line);border-radius:12px;padding:14px;margin-bottom:16px;
+  }
+  .checkout-summary h4,.checkout-form h4{
+    font-size:12px;text-transform:uppercase;letter-spacing:0.04em;color:var(--smoke);margin:0 0 10px;font-weight:800;
+  }
+  .checkout-summary pre{
+    white-space:pre-wrap;font-family:'Space Mono',monospace;font-size:12px;line-height:1.45;color:var(--ink);margin:0;
+  }
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .form-field{margin-bottom:12px;}
+  .form-field.full{grid-column:1 / -1;}
+  .form-field label{display:block;font-size:11.5px;font-weight:800;color:var(--smoke);text-transform:uppercase;letter-spacing:0.03em;margin-bottom:6px;}
+  .form-field input,.form-field textarea,.form-field select{
+    width:100%;padding:11px 12px;border-radius:10px;border:1.5px solid var(--paper-line);
+    background:#fff;font-family:inherit;font-size:14px;color:var(--ink);
+  }
+  .form-field textarea{min-height:78px;resize:vertical;}
+  .payment-box{
+    display:none;background:var(--paper);border-left:4px solid var(--ember);border-radius:10px;padding:12px 14px;
+    font-size:13px;line-height:1.5;color:var(--ink);margin:2px 0 14px;
+  }
+  .payment-box.open{display:block;}
+  .payment-box b{color:var(--ember-dark);}
+  .checkout-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .checkout-actions .checkout-btn{width:auto;flex:1;min-width:190px;margin-top:0;}
+  .secondary-btn{
+    background:var(--charcoal);color:#fff;padding:15px;border-radius:999px;font-weight:700;font-size:15px;flex:1;min-width:190px;
+  }
+  .secondary-btn:hover{background:#000;}
+  .small-note{font-size:11.5px;color:var(--smoke);line-height:1.5;margin:10px 0 0;text-align:center;}
+  @media (max-width:600px){.form-grid{grid-template-columns:1fr;}.checkout-actions .checkout-btn,.secondary-btn{min-width:100%;}}
+
   /* ---------- SIDE PICKER MODAL ---------- */
   .picker-modal{
     position:fixed;top:50%;left:50%;
@@ -763,9 +812,80 @@
     <div class="row"><span>Delivery fee</span><span id="deliveryFee" class="mono">$5.00</span></div>
     <div class="row total"><span>Total</span><span id="total" class="mono">$0.00</span></div>
     <button class="checkout-btn" id="checkoutBtn">Continue to checkout</button>
-    <p class="checkout-note">This page is a design preview. Connect Wix Stores or a payment link to take real orders.</p>
+    <p class="checkout-note">Checkout opens an order form. Customers can pay by MoBanking/bank transfer, cash on delivery, or PayPal.</p>
   </div>
 </aside>
+
+
+<!-- CHECKOUT MODAL -->
+<div class="overlay" id="checkoutOverlay"></div>
+<div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="Checkout form">
+  <div class="checkout-head">
+    <h3>Checkout</h3>
+    <button id="checkoutCloseBtn" aria-label="Close checkout">✕</button>
+  </div>
+  <div class="checkout-body">
+    <div class="checkout-summary">
+      <h4>Order summary</h4>
+      <pre id="checkoutSummary">Your cart is empty.</pre>
+    </div>
+
+    <form class="checkout-form" id="checkoutForm">
+      <h4>Customer details</h4>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="customerName">Name</label>
+          <input id="customerName" name="customerName" type="text" required placeholder="Full name">
+        </div>
+        <div class="form-field">
+          <label for="customerPhone">Phone / WhatsApp</label>
+          <input id="customerPhone" name="customerPhone" type="tel" required placeholder="767-000-0000">
+        </div>
+        <div class="form-field full">
+          <label for="deliveryAddress">Delivery address</label>
+          <textarea id="deliveryAddress" name="deliveryAddress" required placeholder="Building, street, community, landmark"></textarea>
+        </div>
+        <div class="form-field full">
+          <label for="paymentMethod">Payment method</label>
+          <select id="paymentMethod" name="paymentMethod" required>
+            <option value="MoBanking / Bank Transfer">MoBanking / Bank Transfer</option>
+            <option value="Cash on Delivery">Cash on Delivery</option>
+            <option value="PayPal">PayPal</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="payment-box open" id="bankInstructions">
+        <b>MoBanking / Bank Transfer:</b><br>
+        Send payment to the fundraiser collector account listed below, then WhatsApp your transfer confirmation/screenshot with your order.<br><br>
+        Bank: [ADD BANK NAME]<br>
+        Account Name: [ADD COLLECTOR / TREASURER NAME]<br>
+        Account Number: [ADD ACCOUNT NUMBER]<br>
+        Payment Reference: Your Name + BBQ
+      </div>
+      <div class="payment-box" id="cashInstructions">
+        <b>Cash on Delivery:</b><br>
+        Your order will be delivered and payment collected at delivery. Please have the exact amount ready.
+      </div>
+      <div class="payment-box" id="paypalInstructions">
+        <b>PayPal:</b><br>
+        Send payment using the PayPal link or email below, then WhatsApp confirmation with your order.<br><br>
+        PayPal: [ADD PAYPAL LINK OR EMAIL]
+      </div>
+
+      <div class="form-field full">
+        <label for="customerNotes">Notes</label>
+        <textarea id="customerNotes" name="customerNotes" placeholder="Delivery instructions, preferred time, or payment confirmation note"></textarea>
+      </div>
+
+      <div class="checkout-actions">
+        <button type="submit" class="checkout-btn">Send order by WhatsApp</button>
+        <button type="button" class="secondary-btn" id="copyOrderBtn">Copy order text</button>
+      </div>
+      <p class="small-note">This does not process card payments on the website. It prepares the order for WhatsApp/manual confirmation by the fundraiser team.</p>
+    </form>
+  </div>
+</div>
 
 <!-- SIDE PICKER MODAL -->
 <div class="overlay" id="pickerOverlay"></div>
@@ -945,8 +1065,95 @@
   document.getElementById('cartCloseBtn').addEventListener('click', closeDrawer);
   overlay.addEventListener('click', closeDrawer);
 
-  document.getElementById('checkoutBtn').addEventListener('click', () => {
-    alert("This is a static design preview — in Wix, connect this button to Wix Stores checkout or a payment link (Stripe/Square/PayPal) to take real payments.");
+  // ---- Checkout: keeps the cart, then sends/copies order for WhatsApp/manual payment ----
+  const ORDER_WHATSAPP_NUMBER = '17672751234'; // CHANGE THIS to the volunteer/order WhatsApp number, digits only, country code first.
+
+  const checkoutOverlay = document.getElementById('checkoutOverlay');
+  const checkoutModal = document.getElementById('checkoutModal');
+  const paymentMethod = document.getElementById('paymentMethod');
+
+  function getOrderSummary(){
+    const items = Object.values(cart);
+    const zoneSelect = document.getElementById('zoneSelect');
+    const deliveryText = zoneSelect.options[zoneSelect.selectedIndex].text;
+    const subtotal = items.reduce((s,it)=> s + it.qty*it.price, 0);
+    const deliveryFee = items.length ? parseFloat(zoneSelect.value) : 0;
+    const total = subtotal + deliveryFee;
+
+    if(items.length === 0) return 'Your cart is empty.';
+
+    const lines = [];
+    lines.push('BBQ RUSH ORDER');
+    lines.push('----------------');
+    items.forEach(it => lines.push(`${it.qty} x ${it.name} — ${fmt(it.qty * it.price)}`));
+    lines.push('');
+    lines.push(`Subtotal: ${fmt(subtotal)}`);
+    lines.push(`Delivery: ${fmt(deliveryFee)} (${deliveryText})`);
+    lines.push(`TOTAL: ${fmt(total)}`);
+    return lines.join('\n');
+  }
+
+  function getFullOrderMessage(){
+    const name = document.getElementById('customerName').value.trim();
+    const phone = document.getElementById('customerPhone').value.trim();
+    const address = document.getElementById('deliveryAddress').value.trim();
+    const method = paymentMethod.value;
+    const notes = document.getElementById('customerNotes').value.trim();
+
+    return [
+      getOrderSummary(),
+      '',
+      'CUSTOMER DETAILS',
+      '----------------',
+      `Name: ${name}`,
+      `Phone/WhatsApp: ${phone}`,
+      `Delivery Address: ${address}`,
+      `Payment Method: ${method}`,
+      notes ? `Notes: ${notes}` : ''
+    ].filter(Boolean).join('\n');
+  }
+
+  function openCheckout(){
+    if(Object.values(cart).length === 0){
+      alert('Your cart is empty. Please add at least one item before checkout.');
+      return;
+    }
+    document.getElementById('checkoutSummary').textContent = getOrderSummary();
+    closeDrawer();
+    checkoutOverlay.classList.add('open');
+    checkoutModal.classList.add('open');
+  }
+  function closeCheckout(){
+    checkoutOverlay.classList.remove('open');
+    checkoutModal.classList.remove('open');
+  }
+
+  function updatePaymentInstructions(){
+    document.getElementById('bankInstructions').classList.toggle('open', paymentMethod.value === 'MoBanking / Bank Transfer');
+    document.getElementById('cashInstructions').classList.toggle('open', paymentMethod.value === 'Cash on Delivery');
+    document.getElementById('paypalInstructions').classList.toggle('open', paymentMethod.value === 'PayPal');
+  }
+
+  document.getElementById('checkoutBtn').addEventListener('click', openCheckout);
+  document.getElementById('checkoutCloseBtn').addEventListener('click', closeCheckout);
+  checkoutOverlay.addEventListener('click', closeCheckout);
+  paymentMethod.addEventListener('change', updatePaymentInstructions);
+
+  document.getElementById('copyOrderBtn').addEventListener('click', async () => {
+    const message = getFullOrderMessage();
+    try{
+      await navigator.clipboard.writeText(message);
+      alert('Order text copied. You can paste it into WhatsApp, SMS, or email.');
+    } catch(err){
+      alert(message);
+    }
+  });
+
+  document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const message = getFullOrderMessage();
+    const whatsappUrl = `https://wa.me/${ORDER_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   });
 
   // chip active state on scroll
