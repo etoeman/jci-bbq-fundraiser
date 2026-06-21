@@ -302,11 +302,14 @@
     font-weight:700;font-size:15px;margin-top:14px;transition:background .15s ease;
   }
   .checkout-btn:hover{background:var(--ember-dark);}
-  .continue-shopping-btn{
-    width:100%;background:var(--charcoal);color:#fff;padding:13px;border-radius:999px;
-    font-weight:700;font-size:14px;margin-top:12px;transition:background .15s ease, transform .15s ease;
+  .cart-action-row{display:flex;gap:10px;margin-top:14px;}
+  .cart-action-row .checkout-btn{margin-top:0;flex:1;}
+  .cart-action-row .continue-shopping-btn{
+    flex:1;background:var(--charcoal);color:#fff;padding:15px;border-radius:999px;
+    font-weight:700;font-size:15px;transition:background .15s ease;
   }
-  .continue-shopping-btn:hover{background:#000;transform:translateY(-1px);}
+  .cart-action-row .continue-shopping-btn:hover{background:#000;}
+  @media (max-width:600px){.cart-action-row{flex-direction:column;}}
   .checkout-note{font-size:11.5px;color:var(--smoke);text-align:center;margin-top:10px;line-height:1.5;}
 
 
@@ -640,7 +643,6 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
-        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Heineken Beer</h3>
@@ -654,7 +656,6 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
-        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Ju-C</h3>
@@ -668,7 +669,6 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
-        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Water</h3>
@@ -682,7 +682,6 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
-        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Shandy</h3>
@@ -696,7 +695,6 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
-        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Passionfruit Juice</h3>
@@ -724,7 +722,7 @@
       <div class="how-step">
         <span class="tick">02 / CONFIRM</span>
         <h3>We confirm by phone</h3>
-        <p>A JCI Dominica volunteer will call or WhatsApp you at 767-275-1234 to confirm your order and delivery window.</p>
+        <p>A JCI Dominica volunteer will call or WhatsApp you at 767 285 2940 to confirm your order and delivery window.</p>
       </div>
       <div class="how-step">
         <span class="tick">03 / WE DELIVER</span>
@@ -777,7 +775,7 @@
       <div>
         <b>Order now</b>
         <span>Call or WhatsApp</span>
-        <span><a href="tel:7672751234">767-275-1234</a></span>
+        <span><a href="tel:7672852940">767 285 2940</a></span>
       </div>
       <div>
         <b>Organized by</b>
@@ -785,7 +783,7 @@
       </div>
     </div>
   </div>
-  <p class="foot-disclaimer wrap">BBQ Rush is a JCI Dominica Prospective Project fundraiser. Delivery fees vary by zone — call or WhatsApp 767-275-1234 to confirm pricing for your address.</p>
+  <p class="foot-disclaimer wrap">BBQ Rush is a JCI Dominica Prospective Project fundraiser. Delivery fees vary by zone — call or WhatsApp 767 285 2940 to confirm pricing for your address.</p>
 </footer>
 
 <!-- CART DRAWER -->
@@ -816,9 +814,11 @@
     <div class="row"><span>Subtotal</span><span id="subtotal" class="mono">$0.00</span></div>
     <div class="row"><span>Delivery fee</span><span id="deliveryFee" class="mono">$5.00</span></div>
     <div class="row total"><span>Total</span><span id="total" class="mono">$0.00</span></div>
-    <button class="continue-shopping-btn" id="continueShoppingBtn">Continue shopping</button>
-    <button class="checkout-btn" id="checkoutBtn">Continue to order form</button>
-    <p class="checkout-note">Add more mains, sides, or drinks anytime before submitting your order form.</p>
+    <div class="cart-action-row">
+      <button class="continue-shopping-btn" id="continueShoppingBtn" type="button">Continue Shopping</button>
+      <button class="checkout-btn" id="checkoutBtn" type="button">Checkout</button>
+    </div>
+    <p class="checkout-note">Checkout opens the Jotform order form with your cart details already filled in.</p>
   </div>
 </aside>
 
@@ -1069,11 +1069,11 @@
   function closeDrawer(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
   document.getElementById('cartOpenBtn').addEventListener('click', openDrawer);
   document.getElementById('cartCloseBtn').addEventListener('click', closeDrawer);
-  overlay.addEventListener('click', closeDrawer);
   document.getElementById('continueShoppingBtn').addEventListener('click', () => {
     closeDrawer();
     document.getElementById('menu').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+  overlay.addEventListener('click', closeDrawer);
 
   // ---- Checkout: keeps the cart, then sends order details to Jotform ----
   const JOTFORM_URL = 'https://form.jotform.com/261714879759073';
