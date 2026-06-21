@@ -1104,24 +1104,20 @@
 
     const params = new URLSearchParams();
 
-    // These names should match the Jotform field "Unique Name" values.
-    // Extra duplicates are harmless and make prefill more likely if field names differ slightly.
-    params.set('orderSummary', order.summary);
-    params.set('orderTotal', order.total.toFixed(2));
-    params.set('deliveryZone', order.deliveryText);
-    params.set('deliveryFee', order.deliveryFee.toFixed(2));
-    params.set('subtotal', order.subtotal.toFixed(2));
-    params.set('paymentMethod', 'MoBanking / Bank Transfer');
+    // Jotform prefill values using the exact internal field names from the form config.
+    params.set('q6_textbox4', order.deliveryText);
+    params.set('q7_textarea5', order.summary);
+    params.set('q8_textbox6', fmt(order.total));
+    params.set('q9_radio7', 'MoBanking / Bank Transfer');
 
-    params.set('Order Summary', order.summary);
-    params.set('Order Total', order.total.toFixed(2));
-    params.set('Delivery Zone', order.deliveryText);
-    params.set('Delivery Fee', order.deliveryFee.toFixed(2));
-    params.set('Subtotal', order.subtotal.toFixed(2));
-    params.set('Payment Method', 'MoBanking / Bank Transfer');
+    // Optional duplicate values under simple names. These do not hurt anything and can help if
+    // Jotform normalizes field aliases differently in some views.
+    params.set('deliveryZone', order.deliveryText);
+    params.set('orderSummary', order.summary);
+    params.set('orderTotal', fmt(order.total));
 
     closeDrawer();
-    window.open(`${JOTFORM_URL}?${params.toString()}`, '_blank');
+    window.location.href = `${JOTFORM_URL}?${params.toString()}`;
   }
 
   document.getElementById('checkoutBtn').addEventListener('click', openJotformCheckout);
