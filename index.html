@@ -302,15 +302,72 @@
     font-weight:700;font-size:15px;margin-top:14px;transition:background .15s ease;
   }
   .checkout-btn:hover{background:var(--ember-dark);}
-  .cart-action-row{display:flex;gap:10px;margin-top:14px;}
-  .cart-action-row .checkout-btn{margin-top:0;flex:1;}
-  .cart-action-row .continue-shopping-btn{
-    flex:1;background:var(--charcoal);color:#fff;padding:15px;border-radius:999px;
-    font-weight:700;font-size:15px;transition:background .15s ease;
+  .continue-shopping-btn{
+    width:100%;background:var(--charcoal);color:#fff;padding:13px;border-radius:999px;
+    font-weight:700;font-size:14px;margin-top:12px;transition:background .15s ease, transform .15s ease;
   }
-  .cart-action-row .continue-shopping-btn:hover{background:#000;}
-  @media (max-width:600px){.cart-action-row{flex-direction:column;}}
+  .continue-shopping-btn:hover{background:#000;transform:translateY(-1px);}
   .checkout-note{font-size:11.5px;color:var(--smoke);text-align:center;margin-top:10px;line-height:1.5;}
+
+  .order-summary-card{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:12px;
+    padding:16px;
+    margin:14px 0 14px;
+  }
+  .summary-header{
+    font-family:'Big Shoulders Display',sans-serif;
+    font-size:22px;
+    font-weight:800;
+    color:var(--ember-dark);
+    letter-spacing:.03em;
+    margin-bottom:10px;
+  }
+  .summary-item,
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    padding:6px 0;
+    font-size:13.5px;
+    line-height:1.35;
+  }
+  .summary-item span:first-child,
+  .summary-row span:first-child{
+    flex:1;
+  }
+  .summary-item span:last-child,
+  .summary-row span:last-child{
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .summary-empty{
+    color:var(--smoke);
+    font-size:13px;
+    line-height:1.45;
+    padding:6px 0;
+  }
+  .summary-divider{
+    height:1px;
+    background:var(--paper-line);
+    margin:10px 0;
+  }
+  .summary-row.total{
+    font-size:18px;
+    font-weight:800;
+    color:var(--ember-dark);
+    margin-top:2px;
+  }
+  .summary-row.total span:last-child{
+    font-size:20px;
+  }
+  .summary-zone{
+    max-width:180px;
+    text-align:right;
+  }
 
 
   /* ---------- CHECKOUT MODAL ---------- */
@@ -643,6 +700,7 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
+        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Heineken Beer</h3>
@@ -656,6 +714,7 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
+        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Ju-C</h3>
@@ -669,6 +728,7 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
+        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Water</h3>
@@ -682,6 +742,7 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
+        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Shandy</h3>
@@ -695,6 +756,7 @@
     <div class="card">
       <div class="card-top">
         <div class="item-icon"><svg><use href="#icon-cup"/></svg></div>
+        <span class="badge-tbd">price TBD</span>
       </div>
       <div class="card-body">
         <h3>Passionfruit Juice</h3>
@@ -722,7 +784,7 @@
       <div class="how-step">
         <span class="tick">02 / CONFIRM</span>
         <h3>We confirm by phone</h3>
-        <p>A JCI Dominica volunteer will call or WhatsApp you at 767 285 2940 to confirm your order and delivery window.</p>
+        <p>A JCI Dominica volunteer will call or WhatsApp you at 767-275-1234 to confirm your order and delivery window.</p>
       </div>
       <div class="how-step">
         <span class="tick">03 / WE DELIVER</span>
@@ -775,7 +837,7 @@
       <div>
         <b>Order now</b>
         <span>Call or WhatsApp</span>
-        <span><a href="tel:7672852940">767 285 2940</a></span>
+        <span><a href="tel:7672751234">767-275-1234</a></span>
       </div>
       <div>
         <b>Organized by</b>
@@ -783,7 +845,7 @@
       </div>
     </div>
   </div>
-  <p class="foot-disclaimer wrap">BBQ Rush is a JCI Dominica Prospective Project fundraiser. Delivery fees vary by zone — call or WhatsApp 767 285 2940 to confirm pricing for your address.</p>
+  <p class="foot-disclaimer wrap">BBQ Rush is a JCI Dominica Prospective Project fundraiser. Delivery fees vary by zone — call or WhatsApp 767-275-1234 to confirm pricing for your address.</p>
 </footer>
 
 <!-- CART DRAWER -->
@@ -811,14 +873,21 @@
         <option value="15">Roseau → Canefield / Loubiere — $15</option>
       </select>
     </div>
-    <div class="row"><span>Subtotal</span><span id="subtotal" class="mono">$0.00</span></div>
-    <div class="row"><span>Delivery fee</span><span id="deliveryFee" class="mono">$5.00</span></div>
-    <div class="row total"><span>Total</span><span id="total" class="mono">$0.00</span></div>
-    <div class="cart-action-row">
-      <button class="continue-shopping-btn" id="continueShoppingBtn" type="button">Continue Shopping</button>
-      <button class="checkout-btn" id="checkoutBtn" type="button">Checkout</button>
+    <div class="order-summary-card" id="cartSummaryCard">
+      <div class="summary-header">Order Summary</div>
+      <div id="cartSummaryItems">
+        <div class="summary-empty">Your cart is empty.</div>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-row"><span>Delivery Zone</span><span id="summaryZone" class="summary-zone">Roseau &amp; Environs — $5</span></div>
+      <div class="summary-row"><span>Subtotal</span><span id="subtotal" class="mono">$0.00</span></div>
+      <div class="summary-row"><span>Delivery Fee</span><span id="deliveryFee" class="mono">$0.00</span></div>
+      <div class="summary-divider"></div>
+      <div class="summary-row total"><span>Total</span><span id="total" class="mono">$0.00</span></div>
     </div>
-    <p class="checkout-note">Checkout opens the Jotform order form with your cart details already filled in.</p>
+    <button class="continue-shopping-btn" id="continueShoppingBtn">Continue shopping</button>
+    <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+    <p class="checkout-note">Review your order, then checkout to complete delivery and payment details.</p>
   </div>
 </aside>
 
@@ -831,9 +900,17 @@
     <button id="checkoutCloseBtn" aria-label="Close checkout">✕</button>
   </div>
   <div class="checkout-body">
-    <div class="checkout-summary">
-      <h4>Order summary</h4>
-      <pre id="checkoutSummary">Your cart is empty.</pre>
+    <div class="order-summary-card" id="checkoutSummaryCard">
+      <div class="summary-header">Order Summary</div>
+      <div id="checkoutSummaryItems">
+        <div class="summary-empty">Your cart is empty.</div>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-row"><span>Delivery Zone</span><span id="checkoutSummaryZone" class="summary-zone">Roseau &amp; Environs — $5</span></div>
+      <div class="summary-row"><span>Subtotal</span><span id="checkoutSummarySubtotal">$0.00</span></div>
+      <div class="summary-row"><span>Delivery Fee</span><span id="checkoutSummaryDelivery">$0.00</span></div>
+      <div class="summary-divider"></div>
+      <div class="summary-row total"><span>Total</span><span id="checkoutSummaryTotal">$0.00</span></div>
     </div>
 
     <form class="checkout-form" id="checkoutForm">
@@ -944,10 +1021,28 @@
     }
     const subtotal = items.reduce((s,it)=> s + it.qty*it.price, 0);
     const totalQty = items.reduce((s,it)=> s + it.qty, 0);
-    const deliveryFee = items.length ? parseFloat(document.getElementById('zoneSelect').value) : 0;
+    const zoneSelect = document.getElementById('zoneSelect');
+    const deliveryText = zoneSelect.options[zoneSelect.selectedIndex].text;
+    const deliveryFee = items.length ? parseFloat(zoneSelect.value) : 0;
+    const total = subtotal + deliveryFee;
+
+    const summaryItems = document.getElementById('cartSummaryItems');
+    summaryItems.innerHTML = '';
+    if(items.length === 0){
+      summaryItems.innerHTML = '<div class="summary-empty">Your cart is empty.</div>';
+    } else {
+      items.forEach(it => {
+        const row = document.createElement('div');
+        row.className = 'summary-item';
+        row.innerHTML = `<span>${it.name} × ${it.qty}</span><span>${fmt(it.qty * it.price)}</span>`;
+        summaryItems.appendChild(row);
+      });
+    }
+
+    document.getElementById('summaryZone').textContent = deliveryText;
     document.getElementById('subtotal').textContent = fmt(subtotal);
     document.getElementById('deliveryFee').textContent = fmt(deliveryFee);
-    document.getElementById('total').textContent = fmt(subtotal + deliveryFee);
+    document.getElementById('total').textContent = fmt(total);
     document.getElementById('cartCount').textContent = totalQty;
   }
 
@@ -1069,11 +1164,11 @@
   function closeDrawer(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
   document.getElementById('cartOpenBtn').addEventListener('click', openDrawer);
   document.getElementById('cartCloseBtn').addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
   document.getElementById('continueShoppingBtn').addEventListener('click', () => {
     closeDrawer();
     document.getElementById('menu').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  overlay.addEventListener('click', closeDrawer);
 
   // ---- Checkout: keeps the cart, then sends order details to Jotform ----
   const JOTFORM_URL = 'https://form.jotform.com/261714879759073';
@@ -1087,12 +1182,14 @@
     const total = subtotal + deliveryFee;
     const summaryLines = [];
 
-    summaryLines.push('BBQ RUSH ORDER');
-    summaryLines.push('----------------');
-    items.forEach(it => summaryLines.push(`${it.qty} x ${it.name} — ${fmt(it.qty * it.price)}`));
+    summaryLines.push('ORDER SUMMARY');
     summaryLines.push('');
+    items.forEach(it => summaryLines.push(`• ${it.name} × ${it.qty} — ${fmt(it.qty * it.price)}`));
+    summaryLines.push('');
+    summaryLines.push(`Delivery Zone: ${deliveryText}`);
     summaryLines.push(`Subtotal: ${fmt(subtotal)}`);
-    summaryLines.push(`Delivery: ${fmt(deliveryFee)} (${deliveryText})`);
+    summaryLines.push(`Delivery Fee: ${fmt(deliveryFee)}`);
+    summaryLines.push('');
     summaryLines.push(`TOTAL: ${fmt(total)}`);
 
     return {
@@ -1105,12 +1202,37 @@
     };
   }
 
+  function renderCheckoutSummary(){
+    const order = getOrderParts();
+    const itemsContainer = document.getElementById('checkoutSummaryItems');
+    if(!itemsContainer) return;
+    itemsContainer.innerHTML = '';
+
+    if(order.items.length === 0){
+      itemsContainer.innerHTML = '<div class="summary-empty">Your cart is empty.</div>';
+    } else {
+      order.items.forEach(it => {
+        const row = document.createElement('div');
+        row.className = 'summary-item';
+        row.innerHTML = `<span>${it.name} × ${it.qty}</span><span>${fmt(it.qty * it.price)}</span>`;
+        itemsContainer.appendChild(row);
+      });
+    }
+
+    document.getElementById('checkoutSummaryZone').textContent = order.deliveryText;
+    document.getElementById('checkoutSummarySubtotal').textContent = fmt(order.subtotal);
+    document.getElementById('checkoutSummaryDelivery').textContent = fmt(order.deliveryFee);
+    document.getElementById('checkoutSummaryTotal').textContent = fmt(order.total);
+  }
+
   function openJotformCheckout(){
     const order = getOrderParts();
     if(order.items.length === 0){
       alert('Your cart is empty. Please add at least one item before checkout.');
       return;
     }
+
+    renderCheckoutSummary();
 
     const params = new URLSearchParams();
 
