@@ -1088,14 +1088,15 @@
     const total = subtotal + deliveryFee;
     const summaryLines = [];
 
-    summaryLines.push('BBQ RUSH — ORDER SUMMARY');
-    summaryLines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    summaryLines.push('BBQ RUSH ORDER SUMMARY');
+    summaryLines.push('----------------------');
     summaryLines.push('');
+    summaryLines.push('ITEMS');
 
     items.forEach((it, index) => {
       const parsed = splitMealName(it.name);
       summaryLines.push(`${index + 1}. ${parsed.main}`);
-      summaryLines.push(`   Quantity: ${it.qty}`);
+      summaryLines.push(`   Qty: ${it.qty}`);
       if(parsed.sides){
         summaryLines.push(`   Sides: ${parsed.sides}`);
       }
@@ -1104,13 +1105,14 @@
     });
 
     summaryLines.push('DELIVERY');
-    summaryLines.push(`Zone: ${deliveryText}`);
-    summaryLines.push(`Delivery Fee: ${fmt(deliveryFee)}`);
+    summaryLines.push(`   Zone: ${deliveryText}`);
+    summaryLines.push(`   Delivery Fee: ${fmt(deliveryFee)}`);
     summaryLines.push('');
-    summaryLines.push('PAYMENT SUMMARY');
-    summaryLines.push(`Subtotal: ${fmt(subtotal)}`);
-    summaryLines.push(`Delivery: ${fmt(deliveryFee)}`);
-    summaryLines.push(`TOTAL: ${fmt(total)}`);
+    summaryLines.push('PAYMENT');
+    summaryLines.push(`   Subtotal: ${fmt(subtotal)}`);
+    summaryLines.push(`   Delivery: ${fmt(deliveryFee)}`);
+    summaryLines.push('----------------------');
+    summaryLines.push(`   TOTAL DUE: ${fmt(total)}`);
 
     return {
       items,
@@ -1129,22 +1131,23 @@
       return;
     }
 
-    const params = new URLSearchParams();
+    const prefill = {
+      // Jotform prefill values using the exact internal field names from the form config.
+      q6_textbox4: order.deliveryText,
+      q7_textarea5: order.summary,
+      q8_textbox6: fmt(order.total),
+      q9_radio7: 'MoBanking / Bank Transfer'
+    };
 
-    // Jotform prefill values using the exact internal field names from the form config.
-    params.set('q6_textbox4', order.deliveryText);
-    params.set('q7_textarea5', order.summary);
-    params.set('q8_textbox6', fmt(order.total));
-    params.set('q9_radio7', 'MoBanking / Bank Transfer');
-
-    // Optional duplicate values under simple names. These do not hurt anything and can help if
-    // Jotform normalizes field aliases differently in some views.
-    params.set('deliveryZone', order.deliveryText);
-    params.set('orderSummary', order.summary);
-    params.set('orderTotal', fmt(order.total));
+    // Build the query string manually with encodeURIComponent.
+    // URLSearchParams turns spaces into plus signs, and Jotform was showing those plus signs
+    // inside the Order Summary field instead of clean spaces.
+    const query = Object.entries(prefill)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
 
     closeDrawer();
-    window.location.href = `${JOTFORM_URL}?${params.toString()}`;
+    window.location.href = `${JOTFORM_URL}?${query}`;
   }
 
   document.getElementById('checkoutBtn').addEventListener('click', openJotformCheckout);
