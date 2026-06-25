@@ -308,6 +308,29 @@
     font-weight:700;font-size:14px;margin-top:12px;transition:background .15s ease, transform .15s ease;
   }
   .continue-shopping-btn:hover{background:#000;transform:translateY(-1px);}
+
+  .pickup-info{
+    margin-top:10px;
+    padding:12px 14px;
+    border-radius:12px;
+    background:rgba(232,162,61,0.20);
+    border:1px solid var(--mustard-soft);
+    color:var(--ink);
+    line-height:1.45;
+  }
+  .pickup-info-title{
+    font-size:11.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--ember-dark);
+    margin-bottom:4px;
+  }
+  .pickup-info-address{
+    font-size:13.5px;
+    font-weight:700;
+  }
+  .pickup-info.hidden{display:none;}
   .checkout-note{font-size:11.5px;color:var(--smoke);text-align:center;margin-top:10px;line-height:1.5;}
 
 
@@ -725,7 +748,7 @@
       <div class="how-step">
         <span class="tick">03 / RECEIVE</span>
         <h3>Pick up or get delivery</h3>
-        <p>Pick up at two story green house next to Escape Restaurant, or choose delivery within the listed zones on Saturday, June 27th, 2026.</p>
+        <p>Pick up at Two story green house next to Escape Restaurant, or choose delivery within the listed zones on Saturday, June 27th, 2026.</p>
       </div>
     </div>
   </div>
@@ -740,7 +763,7 @@
         <div class="df-icon">📍</div>
         <div class="df-zone">Pick-Up<br>Available</div>
         <div class="df-price">FREE</div>
-        <div class="df-address">Two story green house next to Escape Restaurant</div>
+        <div class="df-address">Two story green house<br>next to Escape Restaurant</div>
       </div>
       <div class="df-col">
         <div class="df-icon">🛵</div>
@@ -758,7 +781,7 @@
         <div class="df-price">$15</div>
       </div>
     </div>
-    <p class="df-note">Pick-up is available at Corner of Cork Street and Bath Road (close to Fire Headquarters). Delivery cutoff points are Canefield (north) / Loubiere (south).</p>
+    <p class="df-note">Pick-up is free at the two story green house next to Escape Restaurant. Delivery cutoff points are Canefield (north) / Loubiere (south).</p>
   </div>
 </section>
 
@@ -771,10 +794,10 @@
     </div>
     <div class="foot-links">
       <div>
-        <b>Delivery</b>
+        <b>Pickup / Delivery</b>
         <span>Order by Thu, June 25th</span>
-        <span>Delivered Sat, June 27th 2026</span>
-        <span>Across Roseau · $5–$15</span>
+        <span>Pickup or delivery Sat, June 27th 2026</span>
+        <span>Pickup free · Delivery $5–$15</span>
       </div>
       <div>
         <b>Questions/Issues</b>
@@ -787,7 +810,7 @@
       </div>
     </div>
   </div>
-  <p class="foot-disclaimer wrap">BBQ Rush is a JCI Dominica Prospective Project fundraiser. Pick-up is available at Corner of Cork Street and Bath Road (close to Fire Headquarters). Delivery fees vary by zone — call or WhatsApp 767 285 2940 to confirm details.</p>
+  <p class="foot-disclaimer wrap">BBQ Rush is a JCI Dominica Prospective Project fundraiser. Pick-up is free at the two story green house next to Escape Restaurant. Delivery fees vary by zone — call or WhatsApp 767 285 2940 to confirm details.</p>
 </footer>
 
 <!-- CART DRAWER -->
@@ -808,13 +831,17 @@
   </div>
   <div class="drawer-foot">
     <div class="zone-wrap">
-      <label for="zoneSelect">Pickup / delivery option</label>
+      <label for="zoneSelect">Delivery / Pickup Option</label>
       <select id="zoneSelect">
-        <option value="0">Pick-Up Available — Corner of Cork Street and Bath Road (Close to Fire Headquarters) — Free</option>
-        <option value="5">Roseau &amp; Environs — $5</option>
-        <option value="10">Roseau → Fond Cole / Citronier — $10</option>
-        <option value="15">Roseau → Canefield / Loubiere — $15</option>
+        <option value="0" data-type="pickup" data-label="Pickup (Free)">Pickup (Free)</option>
+        <option value="5" data-type="delivery" data-label="Roseau &amp; Environs (+$5)">Roseau &amp; Environs (+$5)</option>
+        <option value="10" data-type="delivery" data-label="Roseau to Fond Cole / Citronier (+$10)">Roseau to Fond Cole / Citronier (+$10)</option>
+        <option value="15" data-type="delivery" data-label="Roseau to Canefield / Loubiere (+$15)">Roseau to Canefield / Loubiere (+$15)</option>
       </select>
+      <div class="pickup-info" id="pickupInfo">
+        <div class="pickup-info-title">📍 Pickup Location</div>
+        <div class="pickup-info-address">Two story green house next to Escape Restaurant</div>
+      </div>
     </div>
     <div class="row"><span>Subtotal</span><span id="subtotal" class="mono">$0.00</span></div>
     <div class="row"><span>Pickup / delivery fee</span><span id="deliveryFee" class="mono">$0.00</span></div>
@@ -954,7 +981,7 @@
     document.getElementById('cartCount').textContent = totalQty;
   }
 
-  document.getElementById('zoneSelect').addEventListener('change', render);
+  document.getElementById('zoneSelect').addEventListener('change', () => { render(); updatePickupInfo(); });
 
   document.querySelectorAll('.add-btn:not(.configure-btn)').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1080,6 +1107,24 @@
 
   // ---- Checkout: keeps the cart, then sends order details to Jotform ----
   const JOTFORM_URL = 'https://form.jotform.com/261714879759073';
+  const PICKUP_ADDRESS = 'Two story green house next to Escape Restaurant';
+
+  function getSelectedFulfillment(){
+    const zoneSelect = document.getElementById('zoneSelect');
+    const option = zoneSelect.options[zoneSelect.selectedIndex];
+    return {
+      label: option.dataset.label || option.text,
+      type: option.dataset.type || (parseFloat(option.value) === 0 ? 'pickup' : 'delivery'),
+      fee: parseFloat(option.value) || 0
+    };
+  }
+
+  function updatePickupInfo(){
+    const info = document.getElementById('pickupInfo');
+    if(!info) return;
+    const fulfillment = getSelectedFulfillment();
+    info.classList.toggle('hidden', fulfillment.type !== 'pickup');
+  }
 
   function splitMealName(name){
     const match = name.match(/^(.*?)\s*\((.*)\)$/);
@@ -1089,10 +1134,10 @@
 
   function getOrderParts(){
     const items = Object.values(cart);
-    const zoneSelect = document.getElementById('zoneSelect');
-    const deliveryText = zoneSelect.options[zoneSelect.selectedIndex].text;
+    const fulfillment = getSelectedFulfillment();
+    const deliveryText = fulfillment.type === 'pickup' ? 'Pickup (Free)' : fulfillment.label;
     const subtotal = items.reduce((s,it)=> s + it.qty*it.price, 0);
-    const deliveryFee = items.length ? parseFloat(zoneSelect.value) : 0;
+    const deliveryFee = items.length ? fulfillment.fee : 0;
     const total = subtotal + deliveryFee;
     const summaryLines = [];
 
@@ -1114,6 +1159,9 @@
 
     summaryLines.push('PICKUP / DELIVERY');
     summaryLines.push(`   Option: ${deliveryText}`);
+    if(fulfillment.type === 'pickup'){
+      summaryLines.push(`   Pickup Location: ${PICKUP_ADDRESS}`);
+    }
     summaryLines.push(`   Fee: ${fmt(deliveryFee)}`);
     summaryLines.push('');
     summaryLines.push('PAYMENT');
@@ -1128,7 +1176,9 @@
       subtotal,
       deliveryFee,
       total,
-      deliveryText
+      deliveryText,
+      fulfillmentType: fulfillment.type,
+      pickupAddress: fulfillment.type === 'pickup' ? PICKUP_ADDRESS : ''
     };
   }
 
@@ -1141,7 +1191,8 @@
 
     const prefill = {
       // Jotform prefill values using the exact internal field names from the form config.
-      q6_textbox4: order.deliveryText,
+      ...(order.fulfillmentType === 'pickup' ? { q5_address3: order.pickupAddress } : {}),
+      q6_textbox4: order.fulfillmentType === 'pickup' ? `${order.deliveryText} — ${order.pickupAddress}` : order.deliveryText,
       q7_textarea5: order.summary,
       q8_textbox6: fmt(order.total),
       q9_radio7: 'MoBanking / Bank Transfer'
@@ -1173,6 +1224,7 @@
   sections.forEach(s => obs.observe(s));
 
   render();
+  updatePickupInfo();
 </script>
 
 </body>
