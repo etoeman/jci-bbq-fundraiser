@@ -227,13 +227,14 @@
   .df-title{font-size:28px;text-align:center;margin-bottom:26px;color:var(--ink);}
   .df-box{
     border:2px solid var(--ember);border-radius:14px;overflow:hidden;
-    display:grid;grid-template-columns:repeat(3,1fr);background:#fff;
+    display:grid;grid-template-columns:repeat(4,1fr);background:#fff;
   }
   .df-col{padding:24px 16px;text-align:center;border-left:1px dashed var(--paper-line);}
   .df-col:first-child{border-left:none;}
   .df-icon{font-size:26px;margin-bottom:10px;}
   .df-zone{font-size:12.5px;color:var(--smoke);font-weight:700;line-height:1.4;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.02em;}
   .df-price{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:28px;color:var(--ember-dark);}
+  .df-address{font-size:11.5px;color:var(--smoke);line-height:1.35;margin-top:8px;}
   .df-note{text-align:center;font-size:12.5px;color:var(--smoke);margin-top:16px;}
 
   /* ---------- FOOTER ---------- */
@@ -709,22 +710,22 @@
 <!-- HOW IT WORKS -->
 <section class="how">
   <div class="how-inner">
-    <h2>How delivery works</h2>
+    <h2>How pickup / delivery works</h2>
     <div class="how-grid">
       <div class="how-step">
         <span class="tick">01 / ORDER</span>
         <h3>Build your order online</h3>
-        <p>Add your mains, pick your 2 free sides, choose your delivery zone, and check out — by the Thursday, June 25th, 2026 cutoff.</p>
+        <p>Add your mains, pick your 2 free sides, choose pickup or delivery, and check out — by the Thursday, June 25th, 2026 cutoff.</p>
       </div>
       <div class="how-step">
         <span class="tick">02 / CONFIRM</span>
         <h3>We confirm by phone</h3>
-        <p>A JCI Dominica volunteer will call or WhatsApp you from 767 285 2940 to confirm your order and delivery window.</p>
+        <p>A JCI Dominica volunteer will call or WhatsApp you from 767 285 2940 to confirm your order and pickup/delivery details.</p>
       </div>
       <div class="how-step">
-        <span class="tick">03 / WE DELIVER</span>
-        <h3>It comes to your door</h3>
-        <p>Our rider brings your hot plates straight to your address across Roseau on Saturday, June 27th, 2026.</p>
+        <span class="tick">03 / RECEIVE</span>
+        <h3>Pick up or get delivery</h3>
+        <p>Pick up at Corner of Cork Street and Bath Road, close to Fire Headquarters, or choose delivery within the listed zones on Saturday, June 27th, 2026.</p>
       </div>
     </div>
   </div>
@@ -733,8 +734,14 @@
 <!-- DELIVERY FEES -->
 <section class="delivery-fees">
   <div class="wrap">
-    <h2 class="df-title">Delivery Fees</h2>
+    <h2 class="df-title">Pickup &amp; Delivery Options</h2>
     <div class="df-box">
+      <div class="df-col">
+        <div class="df-icon">📍</div>
+        <div class="df-zone">Pick-Up<br>Available</div>
+        <div class="df-price">FREE</div>
+        <div class="df-address">Corner of Cork Street and Bath Road<br>(Close to Fire Headquarters)</div>
+      </div>
       <div class="df-col">
         <div class="df-icon">🛵</div>
         <div class="df-zone">Roseau &amp;<br>Environs</div>
@@ -751,7 +758,7 @@
         <div class="df-price">$15</div>
       </div>
     </div>
-    <p class="df-note">Delivery cutoff points are Canefield (north) / Loubiere (south).</p>
+    <p class="df-note">Pick-up is available at Corner of Cork Street and Bath Road (close to Fire Headquarters). Delivery cutoff points are Canefield (north) / Loubiere (south).</p>
   </div>
 </section>
 
@@ -780,7 +787,7 @@
       </div>
     </div>
   </div>
-  <p class="foot-disclaimer wrap">BBQ Rush is a JCI Dominica Prospective Project fundraiser. Delivery fees vary by zone — call or WhatsApp 767 285 2940 to confirm pricing for your address.</p>
+  <p class="foot-disclaimer wrap">BBQ Rush is a JCI Dominica Prospective Project fundraiser. Pick-up is available at Corner of Cork Street and Bath Road (close to Fire Headquarters). Delivery fees vary by zone — call or WhatsApp 767 285 2940 to confirm details.</p>
 </footer>
 
 <!-- CART DRAWER -->
@@ -801,19 +808,20 @@
   </div>
   <div class="drawer-foot">
     <div class="zone-wrap">
-      <label for="zoneSelect">Delivery zone</label>
+      <label for="zoneSelect">Pickup / delivery option</label>
       <select id="zoneSelect">
+        <option value="0">Pick-Up Available — Corner of Cork Street and Bath Road (Close to Fire Headquarters) — Free</option>
         <option value="5">Roseau &amp; Environs — $5</option>
         <option value="10">Roseau → Fond Cole / Citronier — $10</option>
         <option value="15">Roseau → Canefield / Loubiere — $15</option>
       </select>
     </div>
     <div class="row"><span>Subtotal</span><span id="subtotal" class="mono">$0.00</span></div>
-    <div class="row"><span>Delivery fee</span><span id="deliveryFee" class="mono">$5.00</span></div>
+    <div class="row"><span>Pickup / delivery fee</span><span id="deliveryFee" class="mono">$0.00</span></div>
     <div class="row total"><span>Total</span><span id="total" class="mono">$0.00</span></div>
     <button class="continue-shopping-btn" id="continueShoppingBtn">Continue shopping</button>
     <button class="checkout-btn" id="checkoutBtn">Checkout</button>
-    <p class="checkout-note">Review your order, then checkout to complete your delivery and payment details.</p>
+    <p class="checkout-note">Review your order, then checkout to complete your pickup/delivery and payment details.</p>
   </div>
 </aside>
 
@@ -1104,13 +1112,13 @@
       summaryLines.push('');
     });
 
-    summaryLines.push('DELIVERY');
-    summaryLines.push(`   Zone: ${deliveryText}`);
-    summaryLines.push(`   Delivery Fee: ${fmt(deliveryFee)}`);
+    summaryLines.push('PICKUP / DELIVERY');
+    summaryLines.push(`   Option: ${deliveryText}`);
+    summaryLines.push(`   Fee: ${fmt(deliveryFee)}`);
     summaryLines.push('');
     summaryLines.push('PAYMENT');
     summaryLines.push(`   Subtotal: ${fmt(subtotal)}`);
-    summaryLines.push(`   Delivery: ${fmt(deliveryFee)}`);
+    summaryLines.push(`   Pickup / Delivery Fee: ${fmt(deliveryFee)}`);
     summaryLines.push('----------------------');
     summaryLines.push(`   TOTAL DUE: ${fmt(total)}`);
 
