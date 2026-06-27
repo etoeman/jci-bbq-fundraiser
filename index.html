@@ -212,6 +212,41 @@
   }
   .add-btn:hover{background:var(--ember-dark);transform:scale(1.06);}
 
+  /* ---------- ORDERS CLOSED ---------- */
+  .orders-closed-banner{
+    background:var(--mustard);
+    color:var(--charcoal);
+    padding:18px 22px;
+    border-radius:14px;
+    font-weight:800;
+    max-width:680px;
+    margin:0 auto 24px;
+    text-align:center;
+    box-shadow:var(--shadow-card);
+  }
+  .orders-closed-banner span{
+    display:block;
+    font-size:14px;
+    font-weight:600;
+    margin-top:4px;
+  }
+  .orders-closed-note{
+    font-size:12.5px;
+    color:var(--ember-dark);
+    font-weight:700;
+    background:rgba(232,162,61,0.18);
+    padding:7px 10px;
+    border-radius:6px;
+    display:inline-block;
+    margin-top:8px;
+  }
+  .cart-btn,
+  .add-btn,
+  .btn-primary,
+  .checkout-btn{
+    display:none !important;
+  }
+
   /* ---------- HOW IT WORKS / PICKUP ---------- */
   .how{background:var(--charcoal);color:var(--cream);padding:56px 0;margin-top:50px;}
   .how-inner{max-width:1180px;margin:0 auto;padding:0 24px;}
@@ -505,7 +540,11 @@
         </svg>
       </div>
     </div>
-    <p class="lede">JCI Dominica is firing up the grill for BBQ Rush — order online and we'll deliver hot, smoked plates straight to your door across Roseau on Saturday, June 27th, 2026.</p>
+    <div class="orders-closed-banner">
+      ORDERS ARE NOW CLOSED
+      <span>Thank you for supporting the JCI Dominica BBQ Fundraiser!</span>
+    </div>
+    <p class="lede">Thank you for your generous support. Online ordering for BBQ Rush has now closed.</p>
     <div class="hero-ctas">
       <a href="#mains" class="btn-primary">
         Order your BBQ
@@ -944,6 +983,7 @@
 </div>
 
 <script>
+  const ORDERS_OPEN = false;
   const cart = {};
 
   function fmt(n){ return '$' + n.toFixed(2); }
@@ -985,6 +1025,10 @@
 
   document.querySelectorAll('.add-btn:not(.configure-btn)').forEach(btn => {
     btn.addEventListener('click', () => {
+      if(!ORDERS_OPEN){
+        alert('Orders are now closed. Thank you for supporting JCI Dominica!');
+        return;
+      }
       const id = btn.dataset.id, name = btn.dataset.name, price = parseFloat(btn.dataset.price);
       if(!cart[id]) cart[id] = {id, name, price, qty:0};
       cart[id].qty += 1;
@@ -1051,7 +1095,13 @@
   }
 
   document.querySelectorAll('.configure-btn').forEach(btn => {
-    btn.addEventListener('click', () => openPicker(btn.dataset));
+    btn.addEventListener('click', () => {
+      if(!ORDERS_OPEN){
+        alert('Orders are now closed. Thank you for supporting JCI Dominica!');
+        return;
+      }
+      openPicker(btn.dataset);
+    });
   });
   document.getElementById('pickerCloseBtn').addEventListener('click', closePicker);
   pickerOverlay.addEventListener('click', closePicker);
@@ -1183,6 +1233,10 @@
   }
 
   function openJotformCheckout(){
+    if(!ORDERS_OPEN){
+      alert('Orders are now closed. Thank you for supporting JCI Dominica!');
+      return;
+    }
     const order = getOrderParts();
     if(order.items.length === 0){
       alert('Your cart is empty. Please add at least one item before checkout.');
